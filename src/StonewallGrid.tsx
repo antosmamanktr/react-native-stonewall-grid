@@ -1,68 +1,88 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, View, Image } from "react-native";
+import {
+  Dimensions,
+  View,
+  Image,
+  ImageSourcePropType,
+  ViewStyle,
+} from "react-native";
 
 const { width: screenWidth } = Dimensions.get("window");
-const imageSizeCache = {};
 
-function getImageSize(source) {
+// Cache to prevent repeated image resolution
+const imageSizeCache: Record<string, { width: number; height: number }> = {};
+
+// Helper to get image size from various source types
+function getImageSize(source: ImageSourcePropType): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     if (typeof source === "number") {
       const resolved = Image.resolveAssetSource(source);
-      if (resolved && resolved.width && resolved.height) {
+      if (resolved?.width && resolved?.height) {
         resolve({ width: resolved.width, height: resolved.height });
       } else {
         reject(new Error("Failed to resolve local image asset"));
       }
     } else if (typeof source === "string") {
-      if (imageSizeCache[source]) {
-        resolve(imageSizeCache[source]);
-      } else {
-        Image.getSize(
-          source,
-          (width, height) => {
-            imageSizeCache[source] = { width, height };
-            resolve({ width, height });
-          },
-          (error) => reject(error)
-        );
-      }
-    } else if (source?.uri) {
-      const uri = source.uri;
-      if (imageSizeCache[uri]) {
-        resolve(imageSizeCache[uri]);
-      } else {
-        Image.getSize(
-          uri,
-          (width, height) => {
-            imageSizeCache[uri] = { width, height };
-            resolve({ width, height });
-          },
-          (error) => reject(error)
-        );
-      }
+      if (imageSizeCache[source]) return resolve(imageSizeCache[source]);
+      Image.getSize(
+        source,
+        (width, height) => {
+          imageSizeCache[source] = { width, height };
+          resolve({ width, height });
+        },
+        reject
+      );
+    } else if (
+      typeof source === "object" &&
+      !Array.isArray(source) &&
+      source !== null &&
+      "uri" in source &&
+      typeof (source as { uri: unknown }).uri === "string"
+    ) {
+      const uri = (source as { uri: string }).uri;
+      if (imageSizeCache[uri]) return resolve(imageSizeCache[uri]);
+      Image.getSize(
+        uri,
+        (width, height) => {
+          imageSizeCache[uri] = { width, height };
+          resolve({ width, height });
+        },
+        reject
+      );
     } else {
       reject(new Error("Invalid image source"));
     }
   });
 }
 
-const StonewallGrid = ({
+// Props interface for the grid component
+export interface StonewallGridProps<T = any> {
+  data: T[];
+  renderItem: (info: { item: T }) => React.ReactElement;
+  columns?: number;
+  horizontalSpacing?: number;
+  verticalSpacing?: number;
+  preserveOrder?: boolean;
+  imageFields?: (keyof T)[];
+}
+
+// Main component
+const StonewallGrid = <T extends { [key: string]: any }>({
   data = [],
   renderItem,
   columns = 2,
   horizontalSpacing = 12,
   verticalSpacing = 12,
   preserveOrder = false,
-  imageFields = ["source"], // <- accepts multiple image keys
-}) => {
-  const [columnsData, setColumnsData] = useState([]);
+  imageFields = ["source"],
+}: StonewallGridProps<T>) => {
+  const [columnsData, setColumnsData] = useState<T[][]>([]);
 
   useEffect(() => {
     const prepareGrid = async () => {
       const columnHeights = Array(columns).fill(0);
-      const tempColumns = Array.from({ length: columns }, () => []);
-      const columnWidth =
-        (screenWidth - horizontalSpacing * (columns - 1)) / columns;
+      const tempColumns = Array.from({ length: columns }, () => [] as T[]);
+      const columnWidth = (screenWidth - horizontalSpacing * (columns - 1)) / columns;
 
       for (let i = 0; i < data.length; i++) {
         const item = data[i];
@@ -75,7 +95,8 @@ const StonewallGrid = ({
             value &&
             (typeof value === "number" ||
               typeof value === "string" ||
-              (typeof value === "object" && value.uri))
+              (typeof value === "object" &&
+                (value as { uri?: string }).uri))
           ) {
             try {
               const resolvedSource =
@@ -83,17 +104,18 @@ const StonewallGrid = ({
               const { width, height } = await getImageSize(resolvedSource);
               const scaledHeight = (height / width) * columnWidth;
 
-              // Assign back as { image, height }
-              modifiedItem[field] = {
+              // Cast to any to bypass T[key] strict typing issue
+              (modifiedItem as any)[field] = {
                 image: value,
                 height: scaledHeight,
               };
 
-              // Use first valid height for sorting
               if (!firstValidHeight) {
                 firstValidHeight = scaledHeight;
               }
-            } catch (err) {}
+            } catch (err) {
+              // Ignore image load failures
+            }
           }
         }
 
@@ -102,7 +124,6 @@ const StonewallGrid = ({
           : columnHeights.indexOf(Math.min(...columnHeights));
 
         columnHeights[columnIndex] += firstValidHeight + verticalSpacing;
-
         tempColumns[columnIndex].push(modifiedItem);
       }
 
@@ -110,14 +131,7 @@ const StonewallGrid = ({
     };
 
     prepareGrid();
-  }, [
-    data,
-    columns,
-    horizontalSpacing,
-    verticalSpacing,
-    preserveOrder,
-    imageFields,
-  ]);
+  }, [data, columns, horizontalSpacing, verticalSpacing, preserveOrder, imageFields]);
 
   return (
     <View style={{ flexDirection: "row", paddingHorizontal: 2 }}>
@@ -131,10 +145,7 @@ const StonewallGrid = ({
           }}
         >
           {columnItems.map((item, index) => (
-            <View
-              key={item.id ?? index}
-              style={{ marginBottom: verticalSpacing }}
-            >
+            <View key={(item as any).id ?? index} style={{ marginBottom: verticalSpacing }}>
               {renderItem({ item })}
             </View>
           ))}
