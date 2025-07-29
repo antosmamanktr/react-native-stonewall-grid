@@ -7,8 +7,12 @@ const imageSizeCache = {};
 function getImageSize(source) {
   return new Promise((resolve, reject) => {
     if (typeof source === "number") {
-      const { width, height } = Image.resolveAssetSource(source);
-      resolve({ width, height });
+      const resolved = Image.resolveAssetSource(source);
+      if (resolved && resolved.width && resolved.height) {
+        resolve({ width: resolved.width, height: resolved.height });
+      } else {
+        reject(new Error("Failed to resolve local image asset"));
+      }
     } else if (typeof source === "string") {
       if (imageSizeCache[source]) {
         resolve(imageSizeCache[source]);
