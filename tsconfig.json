@@ -4,6 +4,7 @@
     "module": "esnext",
     "jsx": "react",
     "declaration": true,
+    "declarationDir": "dist/types",
     "outDir": "dist",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
@@ -12,5 +13,5 @@
     "isolatedModules": true,
     "strict": true
   },
-  "include": ["src"]
+  "include": ["src", "index.ts"]
 }
