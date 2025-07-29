@@ -1,0 +1,26 @@
+{
+  "name": "react-native-stonewall-grid",
+  "version": "1.0.0",
+  "description": "A performant and customizable masonry-style layout for React Native.",
+  "main": "index.js",
+  "keywords": [
+    "react-native",
+    "masonry",
+    "grid",
+    "layout",
+    "stonewall"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antosmamanktr/react-native-stonewall-grid.git"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-native": "^0.80.2"
+  },
+  "devDependencies": {
+    "react-native": "^0.80.2"
+  }
+}
