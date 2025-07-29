@@ -16,8 +16,6 @@
 npm install react-native-stonewall-grid
 ```
 
-> _Or just copy the `StonewallGrid.js` file directly into your project._
-
 ## 🚀 Usage
 
 ```jsx
@@ -94,23 +92,11 @@ export default App;
 - Direct URL strings (`'https://...'`)
 - Deep object fields like `item.cover.image`
 
-## 🧠 Internals
-
-- Caches image sizes to reduce layout thrashing
-- Uses `Image.getSize()` and `Image.resolveAssetSource()` safely
-- Only the first valid image field is used for layout balancing
-
 ## ✅ Best Practices
 
 - Always pass `id` or a unique field for items
 - If an item has multiple images, prioritize them in the `imageFields` array
 - Avoid using dynamic `require()` for local images
-
-## 🛠 TODO
-
-- Add infinite scroll support
-- Optional animated transitions
-- RTL layout support
 
 ## 📄 License
 
