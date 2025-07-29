@@ -1,4 +1,8 @@
-# 🧱 StonewallGrid
+# 🧱 react-native-stonewall-grid
+
+<p align="center">
+  <img src="./src/assets/demo-layout.png" alt="StonewallGrid Preview" width="300"/>
+</p>
 
 **StonewallGrid** is a flexible and performant masonry-style layout component for React Native. It automatically detects image fields, calculates their aspect ratios, and arranges them into balanced columns — just like Pinterest.
 
@@ -126,4 +130,4 @@ This package only reads image dimensions and passes back `{ image, height }` in 
 
 ---
 
-Made with ❤️ by [@antosmaman](https://github.com/antosmamanktr)
+Made with ❤️ by [@antosmamanktr](https://github.com/antosmamanktr)
