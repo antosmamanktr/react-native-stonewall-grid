@@ -1,6 +1,6 @@
 {
   "name": "react-native-stonewall-grid",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A performant and customizable masonry-style layout for React Native.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
