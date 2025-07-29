@@ -13,7 +13,7 @@ Built with TypeScript and supports local or remote images with minimal configura
 </td>
 <td  style="border: none">
 
-<img src="./src/assets/demo-layout.png" alt="StonewallGrid Preview" width="200"/>
+<img src="./src/assets/demo-layout.png" alt="StonewallGrid Preview" width="230"/>
 
 </td>
 </tr>
