@@ -2,3 +2,4 @@ src/
 *.log
 babel.config.js
 tsconfig.json
+src/assets/demo-layout.png
