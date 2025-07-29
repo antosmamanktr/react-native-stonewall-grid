@@ -42,15 +42,6 @@ function getImageSize(source) {
   });
 }
 
-function isImageLike(value) {
-  return (
-    typeof value === "number" || // require()
-    (typeof value === "string" &&
-      (value.startsWith("http") || value.startsWith("file"))) ||
-    (typeof value === "object" && value?.uri)
-  );
-}
-
 const StonewallGrid = ({
   data = [],
   renderItem,
@@ -58,6 +49,7 @@ const StonewallGrid = ({
   horizontalSpacing = 12,
   verticalSpacing = 12,
   preserveOrder = false,
+  imageFields = ["source"], // <- accepts multiple image keys
 }) => {
   const [columnsData, setColumnsData] = useState([]);
 
@@ -65,33 +57,39 @@ const StonewallGrid = ({
     const prepareGrid = async () => {
       const columnHeights = Array(columns).fill(0);
       const tempColumns = Array.from({ length: columns }, () => []);
+      const columnWidth =
+        (screenWidth - horizontalSpacing * (columns - 1)) / columns;
 
       for (let i = 0; i < data.length; i++) {
         const item = data[i];
-        const columnWidth =
-          (screenWidth - horizontalSpacing * (columns - 1)) / columns;
+        const modifiedItem = { ...item };
+        let firstValidHeight = 0;
 
-        let modifiedItem = { ...item };
-        let totalHeight = 0;
-
-        const keys = Object.keys(item);
-        for (let key of keys) {
-          const value = item[key];
-          if (isImageLike(value)) {
+        for (const field of imageFields) {
+          const value = item[field];
+          if (
+            value &&
+            (typeof value === "number" ||
+              typeof value === "string" ||
+              (typeof value === "object" && value.uri))
+          ) {
             try {
               const resolvedSource =
                 typeof value === "string" ? { uri: value } : value;
               const { width, height } = await getImageSize(resolvedSource);
               const scaledHeight = (height / width) * columnWidth;
-              totalHeight += scaledHeight;
 
-              modifiedItem[key] = {
+              // Assign back as { image, height }
+              modifiedItem[field] = {
                 image: value,
                 height: scaledHeight,
               };
-            } catch (err) {
-              console.warn("Image load failed:", err);
-            }
+
+              // Use first valid height for sorting
+              if (!firstValidHeight) {
+                firstValidHeight = scaledHeight;
+              }
+            } catch (err) {}
           }
         }
 
@@ -99,7 +97,8 @@ const StonewallGrid = ({
           ? i % columns
           : columnHeights.indexOf(Math.min(...columnHeights));
 
-        columnHeights[columnIndex] += totalHeight + verticalSpacing;
+        columnHeights[columnIndex] += firstValidHeight + verticalSpacing;
+
         tempColumns[columnIndex].push(modifiedItem);
       }
 
@@ -107,7 +106,14 @@ const StonewallGrid = ({
     };
 
     prepareGrid();
-  }, [data, columns, horizontalSpacing, verticalSpacing, preserveOrder]);
+  }, [
+    data,
+    columns,
+    horizontalSpacing,
+    verticalSpacing,
+    preserveOrder,
+    imageFields,
+  ]);
 
   return (
     <View style={{ flexDirection: "row", paddingHorizontal: 2 }}>
