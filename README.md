@@ -1,14 +1,21 @@
-# StonewallGrid
+# 🧱 StonewallGrid
 
-**StonewallGrid** is a flexible and performant masonry layout component for React Native. It automatically detects image fields, calculates their aspect ratio, and arranges them into visually balanced columns—just like Pinterest.
+**StonewallGrid** is a flexible and performant masonry-style layout component for React Native. It automatically detects image fields, calculates their aspect ratios, and arranges them into balanced columns — just like Pinterest.
+
+Built with TypeScript and supports local or remote images with minimal configuration.
+
+---
 
 ## ✨ Features
 
-- Supports remote and local images
-- Automatically scales images to fit the column width
-- Flexible field detection (`imageFields` prop)
-- Adjustable spacing, number of columns, and item order
-- Reusable and customizable through `renderItem`
+- 📐 Automatically scales image height by aspect ratio
+- 🖼️ Supports remote and local images (`require`, `uri`, or string URLs)
+- 🧠 Auto-detects fields via `imageFields` prop
+- 🔀 Optional order preservation
+- ⚙️ Fully customizable with your own `renderItem`
+- 📱 Responsive column layout based on screen width
+
+---
 
 ## 📦 Installation
 
@@ -16,17 +23,19 @@
 npm install react-native-stonewall-grid
 ```
 
+---
+
 ## 🚀 Usage
 
-```jsx
+```tsx
 import React from 'react';
-import {Image, Text, View} from 'react-native';
-import StonewallGrid from './StonewallGrid';
+import { Image, Text, View } from 'react-native';
+import StonewallGrid from 'react-native-stonewall-grid';
 
 const data = [
   {
     id: '1',
-    source: {uri: 'https://example.com/image1.jpg'},
+    source: { uri: 'https://example.com/image1.jpg' },
     title: 'First',
   },
   {
@@ -47,7 +56,7 @@ const App = () => {
       data={data}
       columns={2}
       imageFields={['source', 'thumbnail']}
-      renderItem={({item}) => {
+      renderItem={({ item }) => {
         const field = item.source?.image ? 'source' : 'thumbnail';
         const imageData = item[field];
 
@@ -73,35 +82,48 @@ const App = () => {
 export default App;
 ```
 
+---
+
 ## ⚙️ Props
 
-| Prop               | Type          | Default     | Description |
-|--------------------|---------------|-------------|-------------|
-| `data`             | `Array`       | `[]`        | List of data items |
-| `renderItem`       | `Function`    | _required_  | Function to render each item `{item}` |
-| `columns`          | `number`      | `2`         | Number of columns |
-| `horizontalSpacing`| `number`      | `12`        | Horizontal space between columns |
-| `verticalSpacing`  | `number`      | `12`        | Vertical space between items |
-| `preserveOrder`    | `boolean`     | `false`     | Maintain original order (vs shortest column first) |
-| `imageFields`      | `string[]`    | `['source']`| List of image keys to auto-detect and calculate height for |
-
-## 🖼 Image Format Support
-
-- Remote image URLs (`{ uri: 'https://...' }`)
-- Local images via `require()` (number type)
-- Direct URL strings (`'https://...'`)
-- Deep object fields like `item.cover.image`
-
-## ✅ Best Practices
-
-- Always pass `id` or a unique field for items
-- If an item has multiple images, prioritize them in the `imageFields` array
-- Avoid using dynamic `require()` for local images
-
-## 📄 License
-
-MIT
+| Prop               | Type            | Default       | Description |
+|--------------------|-----------------|---------------|-------------|
+| `data`             | `T[]`           | `[]`          | Array of items to render |
+| `renderItem`       | `({ item }) => JSX.Element` | _required_ | Render function per item |
+| `columns`          | `number`        | `2`           | Number of columns |
+| `horizontalSpacing`| `number`        | `12`          | Space between columns |
+| `verticalSpacing`  | `number`        | `12`          | Space between rows |
+| `preserveOrder`    | `boolean`       | `false`       | Maintain original order (vs column height logic) |
+| `imageFields`      | `string[]`      | `['source']`  | Field keys to inspect for image data |
 
 ---
 
-Made with ❤️ for React Native.
+## 🖼 Supported Image Formats
+
+- Remote image objects: `{ uri: 'https://...' }`
+- Local image assets: `require('./path/to/image.jpg')`
+- Direct string URLs: `'https://example.com/image.jpg'`
+
+---
+
+## 🧠 Best Practices
+
+- Always pass a unique `id` (or use index fallback)
+- If an item has multiple image fields, list them in order of priority in `imageFields`
+- Don't use dynamic `require()` (e.g., `require(variable)`)
+
+---
+
+## 💡 Tip
+
+This package only reads image dimensions and passes back `{ image, height }` in the specified image fields. You control exactly how the image is rendered using `renderItem`.
+
+---
+
+## 📄 License
+
+[MIT](./LICENSE)
+
+---
+
+Made with ❤️ by [@antosmaman](https://github.com/antosmamanktr)
