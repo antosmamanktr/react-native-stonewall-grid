@@ -1,12 +1,21 @@
 # 🧱 react-native-stonewall-grid
 
-<p align="center">
-  <img src="./src/assets/demo-layout.png" alt="StonewallGrid Preview" width="300"/>
-</p>
+<div style="display: flex; align-items: center; gap: 16px;">
+
+<div style="flex: 1;">
+
+### 🧱 StonewallGrid
 
 **StonewallGrid** is a flexible and performant masonry-style layout component for React Native. It automatically detects image fields, calculates their aspect ratios, and arranges them into balanced columns — just like Pinterest.
 
 Built with TypeScript and supports local or remote images with minimal configuration.
+
+</div>
+
+<img src="./src/assets/demo-layout.png" alt="StonewallGrid Preview" width="120"/>
+
+</div>
+
 
 ---
 
